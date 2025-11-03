@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 
-const componentMap = JSON.parse(fs.readFileSync(path.join(__dirname, 'component_map.json'), 'utf8'));
+const componentMap = JSON.parse(fs.readFileSync(path.join("https://ai2-convert.netlify.app/functions/", 'component_map.json'), 'utf8'));
 
 // Helper pour convertir un buffer en chaîne de caractères
 const bufferToString = (buffer) => {
