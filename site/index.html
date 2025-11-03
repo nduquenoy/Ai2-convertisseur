@@ -55,7 +55,7 @@
  */
 function startConversion() {
     const fileInput = document.getElementById('aiaFile');
-    const projectName = document.getElementById('projectName').value;
+    const projectName = document.getElementById('projectName').value.trim() || 'ConvertedApp';
     const logOutput = document.getElementById('log-output');
     const file = fileInput.files[0];
 
@@ -66,45 +66,60 @@ function startConversion() {
         return;
     }
 
-    if (!projectName.trim()) {
-        logOutput.textContent += '\nERREUR : Le nom du projet ne peut pas être vide.';
-        return;
-    }
+    logOutput.textContent = `Statut de la conversion : Lecture de "${file.name}" et encodage en Base64...`;
 
-    logOutput.textContent = `Statut de la conversion : Analyse du fichier "${file.name}"...`;
-    
-    // Étape 1 : SIMULATION d'Extraction (lecture en tant que ZIP)
-    setTimeout(() => {
-        logOutput.textContent += '\n[OK] Fichier AIA décompressé. Fichiers sources trouvés (SCM, BKY, assets).';
+    // Utilisation de FileReader pour lire le contenu du fichier
+    const reader = new FileReader();
+
+    reader.onload = async function(event) {
+        // Le résultat est le contenu du fichier encodé en Base64 (après le préfixe)
+        const base64Aia = event.target.result.split(',')[1];
         
-        // Étape 2 : SIMULATION de Conversion de l'Interface (SCM -> XML)
-        setTimeout(() => {
-            logOutput.textContent += '\n[INFO] Analyse de l\'interface (.scm) en cours...';
-            logOutput.textContent += '\n[OK] Interface App Inventor convertie en Layout XML Android.';
+        logOutput.textContent += '\n[OK] Fichier encodé. Envoi à la fonction Netlify...';
+        
+        try {
+            // --- Appel à la fonction Netlify ---
+            const response = await fetch('/.netlify/functions/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    file: base64Aia, // Le contenu Base64 du fichier AIA
+                    projectName: projectName
+                }),
+            });
+            // ------------------------------------
 
-            // Étape 3 : SIMULATION de Conversion de la Logique (BKY -> Kotlin)
-            setTimeout(() => {
-                logOutput.textContent += '\n[INFO] Traduction des Blocs (.bky XML) vers le code Kotlin... (Processus complexe côté serveur)';
-                
-                // C'est l'étape la plus longue et la plus difficile : la transpilation
-                setTimeout(() => {
-                    logOutput.textContent += '\n[OK] Logique des blocs transposée en "MainActivity.kt" Kotlin.';
+            if (!response.ok) {
+                // Tente de lire le message d'erreur du backend
+                const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue du serveur.' }));
+                throw new Error(`Erreur Netlify Function : ${errorData.error || response.statusText}`);
+            }
 
-                    // Étape 4 : SIMULATION d'Assemblage et de Création du ZIP
-                    setTimeout(() => {
-                        logOutput.textContent += '\n[INFO] Création de la structure de projet Android Studio et des fichiers Gradle...';
-                        logOutput.textContent += `\n✅ CONVERSION TERMINÉE ! Fichier "${projectName}.zip" prêt.`;
-                        
-                        // Simulation de la fin de l'opération
-                        // Le code réel initierait ici le téléchargement du fichier ZIP
-                        logOutput.textContent += '\n\nSimuler le téléchargement du fichier ZIP...';
+            // Si la conversion réussit (statut 200)
+            logOutput.textContent += '\n✅ CONVERSION TERMINÉE ! Le fichier ZIP est généré.';
+            
+            // --- Déclenchement du téléchargement ---
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${projectName}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+            // ------------------------------------
 
-                    }, 1500); // Délai pour l'étape 4
-                }, 3000); // Délai pour l'étape 3
-            }, 1500); // Délai pour l'étape 2
-        }, 1500); // Délai pour l'étape 1
+        } catch (error) {
+            logOutput.textContent += `\n❌ ÉCHEC DE LA CONVERSION : ${error.message}`;
+            console.error(error);
+        }
+    };
 
-    }, 1000); // Délai initial
+    // Lecture du fichier comme une URL de données (Base64)
+    reader.readAsDataURL(file);
 }
 </script>
 
