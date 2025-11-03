@@ -1,0 +1,96 @@
+name: 🎉 Interaction & Remerciements
+
+on:
+  issues:
+    types: [opened, closed, reopened]
+  pull_request_target:
+    types: [opened, closed, reopened]
+  push:
+    branches: [main]
+  discussion:
+    types: [created]
+
+jobs:
+  greetings:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      discussions: write
+
+    steps:
+    - name: 🤖 Message de bienvenue (première interaction)
+      uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: |
+          ## 👋 Bonjour ${{ github.actor }} !
+          Je suis **Nicolas**, le fondateur de **La Malédiction du Village**.
+
+          Aujourd'hui est un grand jour : tu as publié ta **première issue** 🍾 !
+
+          Je te remercie donc de contribuer a ce projet, **La Malédiction du Village** !
+          Ton aide nous est précieuse pour l'amélioration.
+
+          N’hésite pas à participer à la discussion ou à proposer des améliorations.
+
+          — *Nicolas*
+        pr-message: |
+          ## 👋 Salut ${{ github.actor }} !  
+          Merci pour ta **première Pull Request** sur *La Malédiction du Village*.
+          
+          Ton implication aide réellement à faire grandir le projet.  
+          Si tu veux, rejoins-nous sur le Discord communautaire pour échanger !
+
+          — *Nicolas*
+
+  thanks:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request_target'
+    permissions:
+      contents: write  # 👈 autorise la création de commentaires sur les commits
+    steps:
+    - name: 🙌 Remercier pour les contributions
+      uses: peter-evans/commit-comment@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+          👏 Merci **${{ github.actor }}** pour ta contribution !
+          Chaque commit compte, et ton travail sur *La Malédiction du Village* est apprécié 💫
+          
+          Continue comme ça, aventurier du code 🐺
+  labeler:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request_target'
+    permissions:
+      contents: write  # 👈 autorise la création de commentaires sur les commits
+    steps:
+    - name: 🏷️ Ajouter des labels automatiques
+      uses: actions-ecosystem/action-add-labels@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        labels: |
+          contribution
+          en-attente-revue
+
+  pr-merge-message:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    permissions:
+      contents: write  # 👈 autorise la création de commentaires sur les commits
+    steps:
+    - name: 🎊 Féliciter pour la fusion de PR
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const pr = context.payload.pull_request;
+          const user = pr.user.login;
+          const message = `🎉 Bravo @${user} ! Ta Pull Request **${pr.title}** vient d’être fusionnée dans *La Malédiction du Village* 🏡  
+          Merci pour ton travail et ta contribution à ce projet magique ✨`;
+          await github.issues.createComment({
+            issue_number: pr.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: message
+          });
