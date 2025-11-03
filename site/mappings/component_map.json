@@ -1,4 +1,3 @@
-// mappings/component_map.json
 {
   "Button": {
     "xml_tag": "Button",
@@ -13,7 +12,6 @@
       "BackgroundColor": "android:backgroundTint",
       "Width": "android:layout_width",
       "Height": "android:layout_height"
-      // Ajoutez ici toutes les propriétés App Inventor
     }
   },
   "TextBox": {
@@ -28,8 +26,6 @@
       "Text": "android:text",
       "Hint": "android:hint",
       "NumbersOnly": "android:inputType"
-      // ...
     }
   }
-  // Ajoutez ici tous les autres composants (Label, ListPicker, etc.)
 }
