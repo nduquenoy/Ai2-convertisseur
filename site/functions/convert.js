@@ -1,6 +1,8 @@
 // netlify/functions/convert.js
 const JSZip = require('jszip');
 const xml2js = require('xml2js');
+const fs = require('fs');
+
 
 const componentMap = JSON.parse(fs.readFileSync(path.join(__dirname, 'component_map.json'), 'utf8'));
 
