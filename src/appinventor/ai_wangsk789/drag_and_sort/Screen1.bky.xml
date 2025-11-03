@@ -1,0 +1,67 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+    <block type="global_declaration" id="LU[SlZJ/EyRYryO=3*hg" x="0" y="0">
+        <field name="NAME">name</field>
+        <value name="VALUE">
+            <block type="lists_from_csv_row" id="{s3hTpR971Yjo5:Zr!*g">
+                <value name="TEXT">
+                    <block type="text" id="tS`%s2,dZn!K*)@9txoM">
+                        <field name="TEXT">Is there, a simple way, to move buttons, from list, and
+                            update the list</field>
+                    </block>
+                </value>
+            </block>
+        </value>
+    </block>
+    <block type="component_event" id="fq`oA-!AhktQNUX*F|zb" x="0" y="53">
+        <mutation component_type="WebViewer" is_generic="false" instance_name="WebViewer1"
+            event_name="WebViewStringChange"></mutation>
+        <field name="COMPONENT_SELECTOR">WebViewer1</field>
+        <statement name="DO">
+            <block type="component_set_get" id=".5eD~SexVea==+2WC=uh">
+                <mutation component_type="Label" set_or_get="set" property_name="Text"
+                    is_generic="false" instance_name="Label1"></mutation>
+                <field name="COMPONENT_SELECTOR">Label1</field>
+                <field name="PROP">Text</field>
+                <value name="VALUE">
+                    <block type="lexical_variable_get" id=":;dGc9REV#h}n(+XE@N?">
+                        <mutation>
+                            <eventparam name="value"></eventparam>
+                        </mutation>
+                        <field name="VAR">value</field>
+                    </block>
+                </value>
+            </block>
+        </statement>
+    </block>
+    <block type="component_event" id=")@afqmZUm+Fhb.STNoU{" x="0" y="170">
+        <mutation component_type="Form" is_generic="false" instance_name="Screen1"
+            event_name="Initialize"></mutation>
+        <field name="COMPONENT_SELECTOR">Screen1</field>
+        <statement name="DO">
+            <block type="component_set_get" id="^I8T6=.o8[gjWwRdd,*z">
+                <mutation component_type="WebViewer" set_or_get="set" property_name="WebViewString"
+                    is_generic="false" instance_name="WebViewer1"></mutation>
+                <field name="COMPONENT_SELECTOR">WebViewer1</field>
+                <field name="PROP">WebViewString</field>
+                <value name="VALUE">
+                    <block type="lexical_variable_get" id=";YYdS:CgQ?+e`|):?@~Y">
+                        <field name="VAR">global name</field>
+                    </block>
+                </value>
+                <next>
+                    <block type="component_method" id="S}$es]g]x!PrCtpohY5a">
+                        <mutation component_type="WebViewer" method_name="GoToUrl"
+                            is_generic="false" instance_name="WebViewer1"></mutation>
+                        <field name="COMPONENT_SELECTOR">WebViewer1</field>
+                        <value name="ARG0">
+                            <block type="text" id="YM5m~7G|dQm{wi8/86s_">
+                                <field name="TEXT">http://localhost/drag.html</field>
+                            </block>
+                        </value>
+                    </block>
+                </next>
+            </block>
+        </statement>
+    </block>
+    <yacodeblocks ya-version="226" language-version="36"></yacodeblocks>
+</xml>

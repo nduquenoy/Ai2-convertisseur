@@ -1,0 +1,31 @@
+{
+    "Button": {
+        "xml_tag": "Button",
+        "id_prefix": "btn",
+        "default_properties": {
+            "Width": "MATCH_PARENT",
+            "Height": "WRAP_CONTENT",
+            "Text": "Bouton"
+        },
+        "property_map": {
+            "Text": "android:text",
+            "BackgroundColor": "android:backgroundTint",
+            "Width": "android:layout_width",
+            "Height": "android:layout_height"
+        }
+    },
+    "TextBox": {
+        "xml_tag": "EditText",
+        "id_prefix": "et",
+        "default_properties": {
+            "Width": "MATCH_PARENT",
+            "Height": "WRAP_CONTENT",
+            "Hint": ""
+        },
+        "property_map": {
+            "Text": "android:text",
+            "Hint": "android:hint",
+            "NumbersOnly": "android:inputType"
+        }
+    }
+}

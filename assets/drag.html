@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>sortable.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
+    <script src="sortable.min.js"></script>
+    <style>
+             span {
+				display:block;
+				border-bottom:1px solid gray;
+				margin-top: 10px;
+
+            }
+    </style>
+</head>
+<body>
+        <div id="container">
+
+        </div>
+    <script>
+		var container = document.getElementById('container');
+		var words;
+		if(window.AppInventor){
+			words= JSON.parse(window.AppInventor.getWebViewString());
+		}else{
+			words = "this is, a very very, long sentense, you can, sort it, by draging".split(",");
+		}
+		
+		
+		words.forEach(word=>{
+			var span = document.createElement('span');
+			span.innerHTML = word;
+			container.appendChild(span);
+		})
+        var ops = {
+            animation: 200,
+            onEnd: function (evt) {
+				var list = [];
+				document.querySelectorAll('span').forEach(n=>{list.push(n.innerHTML)})
+				console.log(list);
+				if(window.AppInventor){
+					window.AppInventor.setWebViewString(JSON.stringify(list));
+				}
+				
+            },
+        };
+        var sortable = Sortable.create(container, ops);
+    </script>
+	
+	
+</body>
+</html>
