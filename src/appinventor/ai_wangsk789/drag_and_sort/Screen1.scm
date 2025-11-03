@@ -1,3 +1,5 @@
+#|
+$JSON
 {
     "authURL": [
         "ai2.appinventor.mit.edu"
@@ -29,3 +31,4 @@
         "Theme": "Classic"
     }
 }
+|#
