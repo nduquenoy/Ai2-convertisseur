@@ -31,3 +31,7 @@
 
 # Build logs directory
 # /build/logs/ @doctocat
+
+# Markdown file
+# Données non-sensibles
+*.md @nduquenoy
