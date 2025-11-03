@@ -2,6 +2,8 @@
 const JSZip = require('jszip');
 const xml2js = require('xml2js');
 
+const componentMap = JSON.parse(fs.readFileSync(path.join(__dirname, 'component_map.json'), 'utf8'));
+
 // Helper pour convertir un buffer en chaîne de caractères
 const bufferToString = (buffer) => {
     return Buffer.from(buffer).toString('utf8');
@@ -118,6 +120,26 @@ async function processAia(zip, projectName) {
     return projectFiles;
 }
 
+function mapComponentToXml(componentType, properties = {}) {
+    const mapEntry = componentMap[componentType];
+    if (!mapEntry) return ''; // Aucun mapping trouvé
+
+    const id = `@+id/${mapEntry.id_prefix}${Math.floor(Math.random() * 10000)}`;
+    const xmlProps = [];
+
+    // On parcourt les propriétés par défaut et celles fournies
+    const allProps = { ...mapEntry.default_properties, ...properties };
+
+    for (const [ai2Prop, androidAttr] of Object.entries(mapEntry.property_map)) {
+        if (allProps[ai2Prop] !== undefined) {
+            xmlProps.push(`${androidAttr}="${allProps[ai2Prop]}"`);
+        }
+    }
+
+    return `<${mapEntry.xml_tag} ${xmlProps.join(' ')} />`;
+}
+
+
 
 // ----------------------------------------------------------------------
 // Les fonctions de conversion réelles (le cœur de la logique)
@@ -129,9 +151,22 @@ async function processAia(zip, projectName) {
  * Ceci est une simplification; la vraie fonction analyserait le format SCM.
  */
 function convertLayoutToXml(scmContent) {
-    // Logique complexe pour lire SCM et générer <ConstraintLayout>, <Button>, <TextView>, etc.
-    const componentCount = (scmContent.match(/type\s+Button/g) || []).length; 
-    
+    // Exemple naïf : extraire tous les composants avec leur type et propriétés
+    const componentMatches = scmContent.matchAll(/type\s+(\w+)(?:\s+properties\s+(\{.*?\}))?/g);
+
+    const xmlComponents = [];
+    for (const match of componentMatches) {
+        const type = match[1];
+        let props = {};
+        try {
+            props = match[2] ? JSON.parse(match[2]) : {};
+        } catch(e) {
+            console.warn(`Impossible de parser les propriétés pour ${type}`);
+        }
+        const xml = mapComponentToXml(type, props);
+        if (xml) xmlComponents.push(xml);
+    }
+
     return `<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -140,19 +175,11 @@ function convertLayoutToXml(scmContent) {
     android:layout_height="match_parent"
     tools:context=".MainActivity">
     
-    <TextView
-        android:id="@+id/textViewStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Interface convertie depuis App Inventor !"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    ${xmlComponents.join('\n    ')}
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-`;
+</androidx.constraintlayout.widget.ConstraintLayout>`;
 }
+
 
 /**
  * Convertit le XML des Blocs Blockly en code Kotlin lisible.
